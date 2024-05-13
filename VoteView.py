@@ -1,9 +1,12 @@
 import discord
 from discord.ext import commands
 
+import functions
+
+
 class VoteView(discord.ui.View):
     def __init__(self, message_id, game_info):
-        super().__init__(timeout=180)
+        super().__init__(timeout=180000000.0)
         self.message_id = message_id
         self.game_info = game_info
         self.voted_users = set()  # Track users who have voted
@@ -75,7 +78,8 @@ class VoteView(discord.ui.View):
 
         stats_message = "Estadísticas de votación:\n"
         for timestamp, count in vote_counts.items():
-            stats_message += f"{self.game_info['timestamps'][timestamp]}: {count} votos\n"
+            formatedtime = functions.get_discord_timestamps(self.game_info['timestamps'][timestamp])
+            stats_message += f"{formatedtime}: {count} votos\n"
 
         original_message = await interaction.channel.fetch_message(self.message_id)
         content_parts = original_message.content.split("\n\n")

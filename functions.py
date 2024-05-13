@@ -17,7 +17,8 @@ day_map = {
     "sunday": 6, "sun": 6, "domingo": 6, "dom": 6, "d": 6, "su": 6
 }
 
-
+def get_hours_array():
+    return hours_array
 def get_utc_hours_array():
     utc_hours_array = []
     for hour in hours_array:
@@ -42,7 +43,7 @@ def get_days(days):
 
 def get_timestamps(day,force_next_week=False):
     timestamps = {}
-    for hour in get_utc_hours_array():
+    for hour in get_hours_array():
         date = datetime.datetime.now()
         if date.weekday() == day:
             if force_next_week:
@@ -57,30 +58,15 @@ def get_timestamps(day,force_next_week=False):
             date += datetime.timedelta(days=(7 - date.weekday() + day) % 7)
 
         date_string = date.strftime("%Y-%m-%d %H:%M:%S")
-        datetime_string = date.strftime("%Y-%m-%d %H:%M:%S UTC"+str(time_zone))
+        datetime_string = date.strftime("%Y-%m-%d %H:%M:%S")
         timestamps[date_string] = datetime_string
     return timestamps
 
-def get_discord_timestamps(day, force_next_week=False):
-    timestamps = {}
-    for hour in get_utc_hours_array():
-        date = datetime.datetime.now()
-        if date.weekday() == day:
-            if force_next_week:
-                date += datetime.timedelta(days=7)
-            if date.hour < 17:
-                date = date.replace(hour=hour, minute=0, second=0, microsecond=0)
-            else:
-                date = date.replace(hour=hour, minute=0, second=0, microsecond=0)
-                date += datetime.timedelta(days=(7 - date.weekday() + day) % 7)
-        else:
-            date = date.replace(hour=hour, minute=0, second=0, microsecond=0)
-            date += datetime.timedelta(days=(7 - date.weekday() + day) % 7)
+def get_discord_timestamps(strdatetime, force_next_week=False):
+    date = datetime.datetime.strptime(strdatetime, "%Y-%m-%d %H:%M:%S")
 
-        date_string = date.strftime("%Y-%m-%d %H:%M:%S")
-        date_formated = f"<t:{int(date.timestamp())}:R>"
-        timestamps[date_string] = date_formated
-    return timestamps
+    date_formated = f"<t:{int(date.timestamp())}:R>"
+    return date_formated
 
 def get_timestamps_map(days, force_next_week=False):
     timestamps_map = {}
