@@ -120,7 +120,7 @@ class VoteView(discord.ui.View):
         role = self.game_info["role"]
         mention = role.mention if role else "@everyone"
         most_voted = self.get_most_voted()
-        await interaction.channel.send(f"La hora seleccionada es: {self.game_info['timestamps'][most_voted]}. {mention}")
+        await interaction.channel.send(f"La hora seleccionada es: {self.game_info['timestamps'][most_voted]} | {functions.get_discord_timestamps(self.game_info['timestamps'][most_voted])}. {mention}")
         await interaction.message.edit(view=self)
 
     def get_most_voted(self):

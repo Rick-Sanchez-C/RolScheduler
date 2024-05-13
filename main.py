@@ -27,7 +27,7 @@ async def on_ready():
     organizer="Organizador de la partida",
     role="Rol que puede participar",
     force_next_week="Forzar la próxima semana",
-    max_time="Hora máxima (HH:MM)"
+    hours="Horas a ofrecer (e.g., 15:00,20:00,20:30)"
 )
 async def create_game(
         interaction: discord.Interaction,
@@ -35,13 +35,17 @@ async def create_game(
         organizer: discord.Member,
         role: discord.Role = None,
         force_next_week: bool = False,
-        max_time: str = "17:00"
+        hours: str = None
 ):
     if not functions.check_days(days):
         await interaction.response.send_message("Días no válidos. Usa: l, m, x, j, v, s, d.", ephemeral=True)
         return
+    if hours and not functions.check_hours(hours):
+        await interaction.response.send_message("Horas no válidas. Usa el formato: 15:00,20:00,20:30", ephemeral=True)
+        return
 
-    timestamps = functions.transform_strdays_to_timestamps(days, force_next_week)
+    hours_array = hours.split(",") if hours else None
+    timestamps = functions.transform_strdays_to_timestamps(days, force_next_week, hours_array)
     mention = role.mention if role else "@everyone"
     message = await interaction.channel.send(f"Se anuncia partida de rol, elegid a que hora está disponible. {mention}")
     game_info[message.id] = {
@@ -52,7 +56,6 @@ async def create_game(
         "participants": []
     }
     await message.edit(content=message.content, view=VoteView(message.id,game_info[message.id]))
-
 
 
 
