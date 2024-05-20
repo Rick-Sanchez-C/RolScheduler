@@ -34,6 +34,8 @@ class VoteView(discord.ui.View):
         # Añadir botones para el organizador
         reset_button = discord.ui.Button(label="Resetear", style=discord.ButtonStyle.danger, custom_id="reset_button")
         complete_button = discord.ui.Button(label="Completar", style=discord.ButtonStyle.success, custom_id="complete_button")
+        #add button to say that you are not able to play
+        not_play_button = discord.ui.Button(label="No puedo jugar", style=discord.ButtonStyle.danger, custom_id="not_play_button")
 
         reset_button.callback = self.reset_button_callback
         complete_button.callback = self.complete_button_callback
@@ -122,6 +124,19 @@ class VoteView(discord.ui.View):
         most_voted = self.get_most_voted()
         await interaction.channel.send(f"La hora seleccionada es: {self.game_info['timestamps'][most_voted]} | {functions.get_discord_timestamps(self.game_info['timestamps'][most_voted])}. {mention}")
         await interaction.message.edit(view=self)
+
+    async def not_play_button_callback(self, interaction: discord.Interaction):
+        if interaction.user.id == self.game_info["organizer"].id:
+            #cancel the game
+            await interaction.channel.send("La partida ha sido cancelada.")
+            await interaction.message.delete()
+            return
+        if interaction.user.id not in self.game_info["participants"]:
+            await interaction.response.send_message("No puedes votar si no vas a jugar.", ephemeral=True)
+            return
+        organizer = self.game_info["organizer"]
+        await organizer.send
+
 
     def get_most_voted(self):
         vote_counts = {timestamp: 0 for timestamp in self.game_info["timestamps"]}

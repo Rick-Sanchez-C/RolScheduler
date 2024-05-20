@@ -90,7 +90,8 @@ def get_timestamps(day, hours,force_next_week=False):
 
 def get_discord_timestamps(strdatetime, force_next_week=False):
     date = datetime.datetime.strptime(strdatetime, "%Y-%m-%d %H:%M:%S")
-
+    #modify date hour using time_zone to UTC
+    date += datetime.timedelta(hours=int(time_zone))
     date_formated = f"<t:{int(date.timestamp())}:R>"
     return date_formated
 

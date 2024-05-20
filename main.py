@@ -53,12 +53,10 @@ async def create_game(
         "role": role,
         "timestamps": timestamps,
         "votes": {},
-        "participants": []
+        "participants": [],
+        "not_play": []
     }
-    await message.edit(content=message.content, view=VoteView(message.id,game_info[message.id]))
-
-
-
+    await message.edit(content=message.content, view=VoteView(message.id, game_info[message.id]))
 
 
 bot.run(BOT_TOKEN)
