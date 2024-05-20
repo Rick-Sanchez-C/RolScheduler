@@ -39,9 +39,11 @@ class VoteView(discord.ui.View):
 
         reset_button.callback = self.reset_button_callback
         complete_button.callback = self.complete_button_callback
+        not_play_button.callback = self.not_play_button_callback
 
         self.add_item(reset_button)
         self.add_item(complete_button)
+        self.add_item(not_play_button)
 
     async def select_callback(self, interaction: discord.Interaction):
         user_id = interaction.user.id
@@ -65,9 +67,25 @@ class VoteView(discord.ui.View):
             self.select_menu.max_values = len(self.select_menu.options)
             self.select_menu.min_values = 1
             await interaction.message.edit(view=self)
-
+        else:
+            #send private message to the organizer saying who voted
+            organizer = self.game_info["organizer"]
+            await organizer.send(f"{interaction.user.mention} ha votado.\n {', '.join(selected_options)}")
         # Mostrar estadísticas
         await self.show_statistics(interaction)
+        #Comprobar si todos votaron usando el role de la partida if role none usar el total del servidor
+        role = self.game_info["role"]
+        if role:
+            members = role.members
+        else:
+            members = interaction.guild.members
+        if len(self.game_info["votes"]) == len(members):
+            await interaction.response.send_message("Todos los participantes han votado.", ephemeral=True)
+            self.select_menu.disabled = True
+            for item in self.children:
+                item.disabled = True
+            await interaction.message.edit(view=self)
+            return
 
         await interaction.response.send_message(f"Has seleccionado: {', '.join(selected_options)}", ephemeral=True)
 
